@@ -1,12 +1,3 @@
----
-title: SaharaCare AI
-emoji: 🏥
-colorFrom: green
-colorTo: green
-sdk: docker
-python_version: 3.10
-pinned: false
----
 
 # SaharaCare AI - Elderly Care Companion
 
