@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>SaharaCare AI - Senior Dashboard</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#21c45d",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#122017",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        .wcag-text-large {
+            font-size: 1.5rem;
+            line-height: 2rem;
+        }
+
+        .wcag-text-xl {
+            font-size: 2rem;
+            line-height: 2.5rem;
+        }
+    </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
+    <div class="relative flex flex-col w-full">
+        <!-- Top Navigation -->
+        <header
+            class="sticky top-0 z-50 bg-background-light dark:bg-background-dark border-b-4 border-primary/20 px-6 py-4 md:px-12 lg:px-24 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <div class="text-primary size-12 flex items-center justify-center bg-primary/10 rounded-2xl">
+                    <span aria-hidden="true" class="material-symbols-outlined text-4xl">medical_services</span>
+                </div>
+                <h1 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100">SaharaCare AI</h1>
+            </div>
+            <div class="flex items-center gap-6">
+                <button aria-label="User Profile"
+                    class="flex items-center gap-3 p-2 rounded-2xl hover:bg-primary/10 transition-colors">
+                    <span class="text-lg font-bold hidden md:block">Hello, Arthur</span>
+                    <div class="size-16 rounded-full bg-primary/20 flex items-center justify-center border-4 border-primary"
+                        data-alt="Senior male user profile picture">
+                        <span class="material-symbols-outlined text-4xl text-primary">person</span>
+                    </div>
+                </button>
+            </div>
+        </header>
+        <!-- Main Dashboard -->
+        <main class="max-w-7xl mx-auto w-full px-6 py-10 md:px-12">
+
+            <!-- Grid of Dashboard Tiles -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- 1. Medication Reminder -->
+                <div
+                    class="bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-xl border-l-8 border-primary flex flex-col gap-6">
+                    <div class="flex items-center gap-4">
+                        <div class="p-4 bg-primary/10 text-primary rounded-xl">
+                            <span class="material-symbols-outlined text-5xl">pill</span>
+                        </div>
+                        <h3 class="wcag-text-large font-bold">Medications</h3>
+                    </div>
+                    <div class="bg-primary/5 p-6 rounded-xl">
+                        <p class="text-xl font-semibold text-slate-700 dark:text-slate-300">Next dose:</p>
+                        <p class="wcag-text-large font-bold text-primary mt-1">Vitamin D at 10 AM</p>
+                    </div>
+                    <button onclick="location.href='medications.html'"
+                        class="w-full bg-primary text-white py-6 rounded-2xl wcag-text-large font-bold shadow-lg active:scale-95 transition-transform">
+                        Go to Medications
+                    </button>
+                </div>
+                <!-- 2. Appointment Calendar -->
+                <div
+                    class="bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-xl border-l-8 border-blue-500 flex flex-col gap-6">
+                    <div class="flex items-center gap-4">
+                        <div class="p-4 bg-blue-500/10 text-blue-500 rounded-xl">
+                            <span class="material-symbols-outlined text-5xl">calendar_month</span>
+                        </div>
+                        <h3 class="wcag-text-large font-bold">Appointments</h3>
+                    </div>
+                    <div class="bg-blue-500/5 p-6 rounded-xl">
+                        <p class="text-xl font-semibold text-slate-700 dark:text-slate-300">Next Visit:</p>
+                        <p class="wcag-text-large font-bold text-blue-600 dark:text-blue-400 mt-1" id="next-appt-text">
+                            Loading...</p>
+                    </div>
+                    <button onclick="alert('Calendar linked! No scheduled appointments currently.');"
+                        class="w-full bg-blue-500 text-white py-6 rounded-2xl wcag-text-large font-bold shadow-lg active:scale-95 transition-transform">
+                        Open Calendar
+                    </button>
+                </div>
+                <!-- 3. Health Logs -->
+                <div
+                    class="bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-xl border-l-8 border-pink-500 flex flex-col gap-6">
+                    <div class="flex items-center gap-4">
+                        <div class="p-4 bg-pink-500/10 text-pink-500 rounded-xl">
+                            <span class="material-symbols-outlined text-5xl">favorite</span>
+                        </div>
+                        <h3 class="wcag-text-large font-bold">Health Logs</h3>
+                    </div>
+                    <p class="text-xl text-slate-600 dark:text-slate-400 leading-relaxed">
+                        Track your daily blood pressure and sugar levels.
+                    </p>
+                    <button onclick="location.href='healthlogs.html'"
+                        class="mt-auto w-full bg-pink-500 text-white py-6 rounded-2xl wcag-text-large font-bold shadow-lg active:scale-95 transition-transform">
+                        Track BP &amp; Sugar
+                    </button>
+                </div>
+                <!-- 4. Emergency SOS (Large RED) -->
+                <div
+                    class="lg:col-span-2 bg-red-600 p-10 rounded-2xl shadow-2xl flex flex-col md:flex-row items-center justify-between gap-8">
+                    <div class="flex flex-col gap-4 text-center md:text-left">
+                        <div class="flex items-center justify-center md:justify-start gap-4">
+                            <span class="material-symbols-outlined text-6xl text-white">emergency_home</span>
+                            <h3 class="text-4xl font-extrabold text-white">Need Help?</h3>
+                        </div>
+                        <p class="text-2xl text-red-100 font-medium">Press the button below to alert your family and
+                            care team immediately.</p>
+                    </div>
+                    <button onclick="location.href='sos.html'"
+                        class="group relative flex flex-col items-center justify-center gap-4 bg-white text-red-600 px-12 py-10 rounded-2xl shadow-[0_15px_30px_rgba(0,0,0,0.3)] active:scale-90 transition-all border-b-8 border-slate-300">
+                        <span class="material-symbols-outlined text-7xl font-bold">warning</span>
+                        <span class="text-4xl font-black uppercase tracking-widest">CALL FOR HELP</span>
+                    </button>
+                </div>
+                <!-- 5. Voice Assistant -->
+                <div
+                    class="bg-primary p-8 rounded-2xl shadow-xl flex flex-col items-center justify-center text-center gap-6">
+                    <div
+                        class="size-24 bg-white/20 rounded-full flex items-center justify-center border-4 border-white/40">
+                        <span class="material-symbols-outlined text-6xl text-white">mic</span>
+                    </div>
+                    <div>
+                        <h3 class="wcag-text-large font-bold text-white mb-2">Voice Assistant</h3>
+                        <p class="text-xl text-primary-100 text-white/90">Just say "SaharaCare..."</p>
+                    </div>
+                    <!-- We will attach the play reminder to this button -->
+                    <button id="play-voice-btn"
+                        class="bg-white text-primary w-full py-6 rounded-2xl wcag-text-large font-bold shadow-lg hover:bg-slate-50 active:scale-95 transition-transform">
+                        Speak Command
+                    </button>
+                    <!-- Hidden audio element to play TTS output -->
+                    <audio id="audio-player" style="display:none;"></audio>
+                </div>
+            </div>
+            <!-- Footer Settings/Home links -->
+            <nav
+                class="mt-16 border-t-2 border-slate-200 dark:border-slate-700 pt-8 flex flex-wrap justify-center gap-10">
+                <a class="flex items-center gap-3 px-8 py-4 rounded-2xl bg-primary text-white font-bold wcag-text-large"
+                    href="#">
+                    <span class="material-symbols-outlined">home</span> Home
+                </a>
+                <a class="flex items-center gap-3 px-8 py-4 rounded-2xl bg-white dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-600 font-bold wcag-text-large"
+                    href="caretaker.html">
+                    <span class="material-symbols-outlined">admin_panel_settings</span> Caretaker Dashboard
+                </a>
+                <a class="flex items-center gap-3 px-8 py-4 rounded-2xl bg-white dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-600 font-bold wcag-text-large"
+                    href="#">
+                    <span class="material-symbols-outlined">contact_support</span> Help
+                </a>
+            </nav>
+        </main>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/voice.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const apptRes = await fetch('http://localhost:5001/appointments');
+                const apptData = await apptRes.json();
+                const appts = apptData.appointments || [];
+                if (appts.length > 0) {
+                    const nextAppt = appts[appts.length - 1]; // fetch latest added or sort
+                    document.getElementById('next-appt-text').innerText = `${nextAppt.title} - ${nextAppt.date} at ${nextAppt.time}`;
+                } else {
+                    document.getElementById('next-appt-text').innerText = "No upcoming appointments.";
+                }
+            } catch (e) {
+                console.error("Dashboard load error", e);
+            }
+        });
+    </script>
+</body>
+
+</html>

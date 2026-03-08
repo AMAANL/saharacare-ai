@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SaharaCare AI - Caretaker Dashboard</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Lexend', sans-serif;
+        }
+
+        .circular-chart {
+            display: block;
+            margin: 0 auto;
+            max-width: 80%;
+            max-height: 250px;
+        }
+
+        .circle-bg {
+            fill: none;
+            stroke: #eee;
+            stroke-width: 3.8;
+        }
+
+        .circle {
+            fill: none;
+            stroke-width: 2.8;
+            stroke-linecap: round;
+            animation: progress 1s ease-out forwards;
+        }
+
+        @keyframes progress {
+            0% {
+                stroke-dasharray: 0 100;
+            }
+        }
+
+        .percentage {
+            fill: #666;
+            font-family: sans-serif;
+            font-size: 0.5em;
+            text-anchor: middle;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-slate-900 min-h-screen">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-white border-r border-gray-200 hidden md:flex flex-col">
+            <div class="h-16 flex items-center px-6 border-b border-gray-200">
+                <span class="material-symbols-outlined text-3xl text-primary mr-2"
+                    style="color:#21c45d;">admin_panel_settings</span>
+                <span class="text-xl font-bold tracking-tight">Caretaker Portal</span>
+            </div>
+            <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
+                <a href="dashboard.html"
+                    class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+                    <span class="material-symbols-outlined mr-3">arrow_back</span> Return to Senior View
+                </a>
+                <a href="#"
+                    class="flex items-center px-4 py-3 bg-[#21c45d] bg-opacity-10 text-[#21c45d] rounded-lg transition-colors font-medium">
+                    <span class="material-symbols-outlined mr-3">monitoring</span> Patient Reports
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto w-full">
+            <header
+                class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 sticky top-0 z-10">
+                <div class="flex items-center gap-4">
+                    <button
+                        class="md:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none">
+                        <span class="material-symbols-outlined">menu</span>
+                    </button>
+                    <h1 class="text-2xl font-bold">Arthur's Monthly Report</h1>
+                </div>
+                <button onclick="downloadReport()"
+                    class="flex items-center gap-2 bg-[#21c45d] text-white px-4 py-2 rounded-lg font-medium hover:bg-green-600 transition-colors shadow-sm">
+                    <span class="material-symbols-outlined">download</span> Download PDF
+                </button>
+            </header>
+
+            <div class="p-6 md:p-10 max-w-7xl mx-auto space-y-8">
+
+                <!-- Status Row -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div
+                        class="bg-gradient-to-br from-white to-green-50 p-6 rounded-3xl shadow-lg border border-green-100 flex flex-col items-center justify-center text-center relative overflow-hidden">
+                        <!-- Decorative bg element -->
+                        <div class="absolute -right-10 -top-10 bg-green-200/40 w-32 h-32 rounded-full blur-3xl"></div>
+                        <h3 class="text-gray-600 font-bold mb-6 z-10 text-lg uppercase tracking-wider">Medical Adherence
+                        </h3>
+                        <div class="relative w-40 h-40 flex items-center justify-center z-10">
+                            <!-- Background Circle -->
+                            <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                                <path class="text-green-100" stroke-width="3" stroke="currentColor" fill="none" d="M18 2.0845
+                                    a 15.9155 15.9155 0 0 1 0 31.831
+                                    a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                <!-- Progress Circle -->
+                                <path id="med-circle"
+                                    class="text-green-500 drop-shadow-md transition-all duration-1000 ease-out"
+                                    stroke-dasharray="0, 100" stroke-width="3.5" stroke-linecap="round"
+                                    stroke="currentColor" fill="none" d="M18 2.0845
+                                    a 15.9155 15.9155 0 0 1 0 31.831
+                                    a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            </svg>
+                            <!-- Inner Text -->
+                            <div class="absolute inset-0 flex flex-col items-center justify-center">
+                                <span id="med-percent"
+                                    class="text-4xl font-extrabold text-green-600 drop-shadow-sm">0%</span>
+                                <span class="text-xs text-green-700 font-medium mt-1">Completion</span>
+                            </div>
+                        </div>
+                        <p
+                            class="text-sm text-green-800/80 font-semibold mt-6 z-10 bg-white/60 px-4 py-1.5 rounded-full shadow-sm">
+                            Monthly Target: 95%</p>
+                    </div>
+
+                    <div class="md:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                        <h3 class="text-gray-500 font-medium mb-4">Blood Pressure Trends (Systolic / Diastolic)</h3>
+                        <div class="relative h-64 w-full">
+                            <canvas id="bpChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Scheduling Tools -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Medications Scheduler -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                        <h3 class="font-bold text-lg mb-4">Medication Scheduler</h3>
+                        <form id="add-med-form" class="space-y-3 mb-6">
+                            <input type="text" id="med-name" placeholder="Medicine Name"
+                                class="w-full rounded-md border-gray-300 shadow-sm" required>
+                            <div class="flex gap-3">
+                                <input type="time" id="med-time" class="w-1/2 rounded-md border-gray-300 shadow-sm"
+                                    required>
+                                <input type="date" id="med-date" class="w-1/2 rounded-md border-gray-300 shadow-sm">
+                            </div>
+                            <p class="text-xs text-gray-500">Leave date empty for daily medicine.</p>
+                            <button type="submit" class="w-full bg-[#21c45d] text-white py-2 rounded-lg font-bold">Add
+                                Medication</button>
+                        </form>
+                        <div class="max-h-48 overflow-y-auto">
+                            <ul id="med-list-admin" class="divide-y divide-gray-100 text-sm"></ul>
+                        </div>
+                    </div>
+
+                    <!-- Appointments Scheduler -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                        <h3 class="font-bold text-lg mb-4">Appointment Calendar</h3>
+                        <form id="add-appt-form" class="space-y-3 mb-6">
+                            <input type="text" id="appt-title" placeholder="Doctor / Event Title"
+                                class="w-full rounded-md border-gray-300 shadow-sm" required>
+                            <div class="flex gap-3">
+                                <input type="date" id="appt-date" class="w-1/2 rounded-md border-gray-300 shadow-sm"
+                                    required>
+                                <input type="time" id="appt-time" class="w-1/2 rounded-md border-gray-300 shadow-sm"
+                                    required>
+                            </div>
+                            <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded-lg font-bold">Add
+                                Appointment</button>
+                        </form>
+                        <div class="max-h-56 overflow-y-auto">
+                            <ul id="appt-list-admin" class="divide-y divide-gray-100 text-sm"></ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Health Logs Data Table -->
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="px-6 py-5 border-b border-gray-100 flex justify-between items-center">
+                        <h3 class="font-bold text-lg">Detailed Health Logs</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-gray-50 text-gray-500 text-sm border-b border-gray-100">
+                                    <th class="py-3 px-6 font-medium">Date</th>
+                                    <th class="py-3 px-6 font-medium">Blood Pressure</th>
+                                    <th class="py-3 px-6 font-medium">Glucose</th>
+                                    <th class="py-3 px-6 font-medium">Status AI Analysis</th>
+                                </tr>
+                            </thead>
+                            <tbody id="health-log-tbody" class="divide-y divide-gray-100">
+                                <!-- Populated dynamically -->
+                                <tr>
+                                    <td class="py-4 px-6 text-sm text-gray-500" colspan="4">Loading logs from backend...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script src="js/caretaker.js"></script>
+    <script>
+        function downloadReport() {
+            alert("Generating comprehensive PDF report for the month... This capability can be hooked to a backend PDF generator.");
+        }
+    </script>
+</body>
+
+</html>

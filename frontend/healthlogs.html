@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&amp;display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet">
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+          theme: {
+            extend: {
+                colors: {
+                    "primary": "#21c45d",
+                    "background-light": "#f6f8f7",
+                    "background-dark": "#122017",
+                },
+                fontFamily: {
+                    "display": ["Lexend"]
+                },
+                borderRadius: {
+                "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+    <title>SaharaCare AI - Health Logs</title>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100">
+    <div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
+        <div class="layout-container flex h-full grow flex-col">
+            <!-- Navigation Header -->
+            <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200
+                dark:border-slate-800 px-6 md:px-10 py-4 bg-white dark:bg-slate-900">
+                <div class="flex items-center gap-4">
+                    <div class="text-primary">
+                        <span class="material-symbols-outlined text-3xl">shield_moon</span>
+                    </div>
+                    <h2 class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-tight">
+                        SaharaCare AI</h2>
+                </div>
+                <div class="flex gap-4">
+                    <button class="flex items-center justify-center rounded-lg h-10 w-10 bg-slate-100 dark:bg-slate-800
+                        text-slate-900 dark:text-slate-100">
+                        <span class="material-symbols-outlined">notifications</span>
+                    </button>
+                </div>
+            </header>
+            <main class="flex-1 max-w-5xl mx-auto w-full p-4 md:p-8">
+                <!-- Top Section with Back Button -->
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+                    <div>
+                        <h1 class="text-3xl md:text-4xl font-black leading-tight tracking-tight">My Health Trends</h1>
+                        <p class="text-slate-500 dark:text-slate-400 text-lg mt-1">Great job tracking today!</p>
+                    </div>
+                    <button onclick="location.href='dashboard.html' " class="flex min-w-[120px] cursor-pointer
+                        items-center justify-center rounded-xl h-12 px-6 bg-primary/10 text-primary hover:bg-primary/20
+                        transition-colors text-base font-bold gap-2">
+                        <span class="material-symbols-outlined">arrow_back</span>
+                        <span>Back</span>
+                    </button>
+                </div>
+                <!-- Input Section -->
+                <section class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+                    <div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800
+                        shadow-sm">
+                        <div class="flex items-center gap-3 mb-6">
+                            <span class="material-symbols-outlined text-primary p-2 bg-primary/10
+                                rounded-lg">edit_note</span>
+                            <h2 class="text-xl font-bold">Log New Metrics</h2>
+                        </div>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-1.5 opacity-70">Systolic BP</label>
+                                <div class="relative">
+                                    <input id="systolic" class="w-full h-14 bg-slate-50 dark:bg-slate-800
+                                        border-slate-200 dark:border-slate-700 rounded-lg px-4 text-lg focus:ring-2
+                                        focus:ring-primary focus:border-transparent outline-none transition-all"
+                                        placeholder="e.g. 120" type="number">
+                                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">mmHg</span>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1.5 opacity-70">Diastolic BP</label>
+                                <div class="relative">
+                                    <input id="diastolic" class="w-full h-14 bg-slate-50 dark:bg-slate-800
+                                        border-slate-200 dark:border-slate-700 rounded-lg px-4 text-lg focus:ring-2
+                                        focus:ring-primary focus:border-transparent outline-none transition-all"
+                                        placeholder="e.g. 80" type="number">
+                                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">mmHg</span>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1.5 opacity-70">Blood Sugar
+                                    (Glucose)</label>
+                                <div class="relative">
+                                    <input id="glucose" class="w-full h-14 bg-slate-50 dark:bg-slate-800
+                                        border-slate-200 dark:border-slate-700 rounded-lg px-4 text-lg focus:ring-2
+                                        focus:ring-primary focus:border-transparent outline-none transition-all"
+                                        placeholder="0.0" type="number">
+                                    <span class="absolute right-4 top-1/2 -translate-y-1/2
+                                        text-slate-400">mg/dL</span>
+                                </div>
+                            </div>
+                            <button id="save-health-btn" class="w-full bg-primary text-white font-bold h-14
+                                rounded-lg text-lg shadow-lg shadow-primary/20 hover:opacity-90 transition-opacity
+                                mt-2">
+                                Save Health Log
+                            </button>
+                        </div>
+                    </div>
+                    <div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800
+                        shadow-sm flex flex-col justify-center items-center text-center">
+                        <div class="w-32 h-32 rounded-full border-[10px] border-primary flex flex-col items-center
+                            justify-center mb-4">
+                            <span id="ai-status-emoji" class="text-3xl font-black text-primary">🩺</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">AI Analysis Status</h3>
+                        <p id="ai-status-text" class="text-slate-500 dark:text-slate-400 max-w-xs">Enter your
+                            metrics to receive an instant analysis.</p>
+                    </div>
+                </section>
+                <!-- Recommendation Banner -->
+                <div class="mt-10 p-6 bg-primary/5 rounded-2xl border-l-4 border-primary flex items-start gap-4">
+                    <span class="material-symbols-outlined text-primary text-3xl">lightbulb</span>
+                    <div>
+                        <h4 class="font-bold text-slate-900 dark:text-white mb-1">Health Tip</h4>
+                        <p class="text-slate-600 dark:text-slate-400 text-sm">Drinking 500ml of water 30 minutes
+                            before your morning walk might help maintain this consistency.</p>
+                    </div>
+                </div>
+            </main>
+            <!-- Bottom Navigation for Mobile -->
+            <nav class="md:hidden sticky bottom-0 w-full bg-white dark:bg-slate-900 border-t border-slate-200
+                dark:border-slate-800 flex justify-around py-4">
+                <button onclick="location.href='dashboard.html' " class="flex flex-col items-center gap-1
+                    text-slate-400">
+                    <span class="material-symbols-outlined">home</span>
+                    <span class="text-[10px]">Home</span>
+                </button>
+                <button onclick="location.href='healthlogs.html' " class="flex flex-col items-center gap-1
+                    text-primary">
+                    <span class="material-symbols-outlined">monitoring</span>
+                    <span class="text-[10px]">Logs</span>
+                </button>
+                <button class="flex flex-col items-center gap-1 text-slate-400">
+                    <span class="material-symbols-outlined">person</span>
+                    <span class="text-[10px]">Profile</span>
+                </button>
+            </nav>
+        </div>
+    </div>
+    <script src="js/health.js"></script>
+</body>
+
+</html>
