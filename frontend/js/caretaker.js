@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:5001';
+const API_URL = '';
 
 async function fetchCaretakerData() {
     try {
@@ -150,6 +150,10 @@ document.addEventListener('DOMContentLoaded', () => {
         fetchAdminAppts();
     });
 });
+
+window.downloadReport = function () {
+    window.location.href = `${API_URL}/generate_report`;
+};
 
 async function fetchAdminMeds() {
     const res = await fetch(`${API_URL}/medications`, { headers: { "X-User-Id": localStorage.getItem("user_id") } });

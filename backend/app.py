@@ -1,8 +1,18 @@
-from flask import Flask, request, jsonify, send_from_directory
+import os
+import sys
+
+# Ultimate fix for imports on cloud servers
+current_dir = os.path.dirname(os.path.abspath(__file__))
+if current_dir not in sys.path:
+    sys.path.insert(0, current_dir)
+
+from flask import Flask, request, jsonify, send_from_directory, make_response
+from fpdf import FPDF
+import io
+from langdetect import detect
 from flask_cors import CORS
 from dotenv import load_dotenv
 import datetime
-import os
 from reminder_engine import get_next_reminder
 from ai_health_model import analyze_health
 from voice_service import generate_hindi_audio
@@ -151,13 +161,82 @@ def sos_alert():
     db['sos_logs'].append(sos_entry)
     return jsonify({"message": "Emergency SOS triggered and logged"}), 200
 
+@app.route('/generate_report', methods=['GET'])
+def generate_report():
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("helvetica", 'B', 16)
+    pdf.cell(190, 10, txt="SaharaCare AI - Patient Health Report", ln=True, align='C')
+    pdf.set_font("helvetica", '', 12)
+    pdf.cell(190, 10, txt=f"Report Generated: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", ln=True, align='C')
+    pdf.ln(10)
+
+    # 1. Meds Section
+    pdf.set_font("helvetica", 'B', 14)
+    pdf.cell(0, 10, txt="1. Medication Overview", ln=True)
+    pdf.set_font("helvetica", 'B', 10)
+    pdf.cell(60, 10, border=1, txt="Medicine Name")
+    pdf.cell(40, 10, border=1, txt="Schedule Time")
+    pdf.cell(40, 10, border=1, txt="Date (if any)")
+    pdf.cell(30, 10, border=1, txt="Status", ln=True)
+
+    pdf.set_font("helvetica", '', 10)
+    for m in db['medications']:
+        pdf.cell(60, 10, border=1, txt=str(m['name']))
+        pdf.cell(40, 10, border=1, txt=str(m['time']))
+        pdf.cell(40, 10, border=1, txt=str(m.get('date','Daily')))
+        pdf.cell(30, 10, border=1, txt="Taken" if m['taken'] else "Pending", ln=True)
+    pdf.ln(10)
+
+    # 2. Health Logs Section
+    pdf.set_font("helvetica", 'B', 14)
+    pdf.cell(0, 10, txt="2. Detailed Health Logs (BP & Glucose)", ln=True)
+    pdf.set_font("helvetica", 'B', 10)
+    pdf.cell(50, 10, border=1, txt="Date/Time")
+    pdf.cell(40, 10, border=1, txt="BP (sys/dia)")
+    pdf.cell(30, 10, border=1, txt="Glucose")
+    pdf.cell(60, 10, border=1, txt="AI Analysis", ln=True)
+
+    pdf.set_font("helvetica", '', 10)
+    for log in db.get('health_logs', []):
+        dt_str = log['date'][:16].replace('T', ' ')
+        bp_str = f"{log['systolic']}/{log['diastolic']}"
+        glu_str = str(log.get('glucose', '-')) + " mg/dL"
+        analysis = analyze_health(log['systolic'], log['diastolic'], log.get('glucose', 0))
+
+        pdf.cell(50, 10, border=1, txt=dt_str)
+        pdf.cell(40, 10, border=1, txt=bp_str)
+        pdf.cell(30, 10, border=1, txt=glu_str)
+        pdf.cell(60, 10, border=1, txt=analysis, ln=True)
+
+    # Return as response with correct headers using BytesIO
+    from io import BytesIO
+    pdf_bytes = pdf.output()
+    # If the output is a string (rare for fpdf2 but possible in some config), encode it
+    if isinstance(pdf_bytes, str):
+        pdf_bytes = pdf_bytes.encode('latin1')
+    
+    response = make_response(pdf_bytes)
+    response.headers['Content-Type'] = 'application/pdf'
+    response.headers['Content-Disposition'] = 'attachment; filename=SaharaCare_Report.pdf'
+    return response
+
 @app.route('/voice_command', methods=['POST'])
 def handle_voice_command():
     data = request.json
     text = data.get('text', '').lower()
+    print(f"DEBUG: Received Voice Command: '{text}'")
     
-    # Check if the user is asking about health
-    if 'sehat' in text or 'health' in text or 'bp' in text or 'sugar' in text or 'सेहत' in text or 'तबीयत' in text or 'कैसी' in text:
+    # Language forced to Hindi as per user request
+    lang_code = 'hi-IN'
+    is_hindi = True
+
+    # Healthcare terms mapping (Keywords in both scripts for reliability)
+    health_keywords = ['sehat', 'health', 'bp', 'sugar', 'सेहत', 'तबीयत', 'कैसी', 'report', 'condition']
+    med_keywords = ['goli', 'dawai', 'दवा', 'गोली', 'medicine', 'tablet', 'pill', 'khani', 'khana', 'take', 'schedule', 'meds', 'which']
+
+    # 1. Health Logic
+    if any(k in text for k in health_keywords):
         if not db['health_logs']:
             reply = "आपका कोई स्वास्थ्य डेटा नहीं मिला है।"
         else:
@@ -165,26 +244,31 @@ def handle_voice_command():
             sys = recent_log['systolic']
             dia = recent_log['diastolic']
             analysis = analyze_health(sys, dia, recent_log.get('glucose', 0))
+            
             if analysis == "High blood pressure detected":
                 reply = f"आपका ब्लड प्रेशर अधिक है। यह {sys} बटा {dia} है। कृपया आराम करें।"
             else:
                 reply = f"आपकी सेहत बिल्कुल ठीक है। आपका ब्लड प्रेशर {sys} बटा {dia} नॉर्मल है।"
     
-    # Check if the user is asking about medicine
-    elif 'goli' in text or 'dawai' in text or 'दवा' in text or 'गोली' in text or 'medicine' in text:
+    # 2. Medicine Logic
+    elif any(k in text for k in med_keywords):
         today_str = datetime.datetime.now().strftime('%Y-%m-%d')
         un_taken = [m for m in db['medications'] if not m['taken'] and (m.get('date', '') == '' or m.get('date') == today_str)]
+        
         if not un_taken:
             reply = "आज के लिए आपकी कोई दवाई बाकी नहीं है।"
         else:
-            meds_str = " और ".join([f"{m['name']} {m['time']} बजे" for m in un_taken])
-            reply = f"आपको ये दवाइयां खानी हैं: {meds_str}।"
+            meds_str_hi = " और ".join([f"{m['name']} {m['time']}" for m in un_taken])
+            reply = f"आपको ये दवाइयां खानी हैं: {meds_str_hi}।"
             
+    # 3. Fallback
     else:
         reply = "मुझे आपका सवाल समझ नहीं आया। क्या आप दवाई या सेहत के बारे में पूछना चाहते हैं?"
         
-    audio_data = generate_hindi_audio(reply)
+    audio_data = generate_hindi_audio(reply, target_language=lang_code)
     return jsonify({"audio": audio_data, "text": reply}), 200
 
 if __name__ == '__main__':
-    app.run(port=5001, debug=True)
+    # Use PORT from environment variable (default to 7860 for Hugging Face)
+    port = int(os.environ.get("PORT", 7860))
+    app.run(host='0.0.0.0', port=port, debug=True)

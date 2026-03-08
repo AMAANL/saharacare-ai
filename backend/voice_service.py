@@ -4,7 +4,7 @@ import json
 
 from dotenv import load_dotenv
 
-def generate_hindi_audio(text):
+def generate_hindi_audio(text, target_language='hi-IN'):
     load_dotenv()
     sarvam_key = os.environ.get("SARVAM_API_KEY")
     if not sarvam_key or sarvam_key == "your_sarvam_api_key_here":
@@ -18,7 +18,7 @@ def generate_hindi_audio(text):
         }
         payload = {
             "inputs": [text],
-            "target_language_code": "hi-IN",
+            "target_language_code": target_language,
             "speaker": "shruti",
             "pace": 1.0,
             "speech_sample_rate": 8000,
@@ -38,5 +38,7 @@ def generate_hindi_audio(text):
 
     import urllib.parse
     encoded_text = urllib.parse.quote(text)
-    fallback_url = f"https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&q={encoded_text}&tl=hi"
+    # Map the iso code for Google TTS (e.g. en-IN -> en)
+    g_lang = target_language.split('-')[0]
+    fallback_url = f"https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&q={encoded_text}&tl={g_lang}"
     return {"type": "url", "data": fallback_url}

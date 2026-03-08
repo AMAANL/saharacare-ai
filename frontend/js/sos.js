@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:5001';
+const SOS_API_URL = '';
 
 const sosBtn = document.getElementById('sos-btn');
 const sosStatus = document.getElementById('sos-status');

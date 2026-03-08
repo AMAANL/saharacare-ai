@@ -191,7 +191,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
             try {
-                const apptRes = await fetch('http://localhost:5001/appointments');
+                const apptRes = await fetch('/appointments');
                 const apptData = await apptRes.json();
                 const appts = apptData.appointments || [];
                 if (appts.length > 0) {

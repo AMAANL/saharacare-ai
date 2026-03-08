@@ -1,4 +1,4 @@
-const VOIC_API_URL = 'http://localhost:5001';
+const VOIC_API_URL = '';
 
 const playVoiceBtn = document.getElementById('play-voice-btn');
 const audioPlayer = document.getElementById('audio-player');
@@ -13,7 +13,7 @@ if (playVoiceBtn) {
         }
 
         const recognition = new SpeechRecognition();
-        recognition.lang = 'hi-IN'; // Listen for Hindi speech
+        recognition.lang = 'en-IN'; // Listen for English/Indian English speech (better for bilingual)
         recognition.interimResults = false;
 
         recognition.onstart = function () {
