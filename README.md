@@ -2,7 +2,6 @@
 # SaharaCare AI - Elderly Care Companion
 
 **SaharaCare AI** is a comprehensive, full-stack companion platform designed specifically for senior citizens (60+) and their caretakers. The application prioritizes extreme accessibility with high-contrast UI, large interactive elements, and a Hindi-speaking voice assistant to ensure ease of use for elderly patients.
-
 Working link: https://huggingface.co/spaces/Amaanlakdawala/saharacareai
 
 ---
