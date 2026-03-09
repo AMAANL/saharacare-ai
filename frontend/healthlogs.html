@@ -12,18 +12,19 @@
     <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
-          theme: {
-            extend: {
-                colors: {
-                    "primary": "#21c45d",
-                    "background-light": "#f6f8f7",
-                    "background-dark": "#122017",
-                },
-                fontFamily: {
-                    "display": ["Lexend"]
-                },
-                borderRadius: {
-                "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#21c45d",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#122017",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"
+                    },
                 },
             },
         }
@@ -135,22 +136,27 @@
                     </div>
                 </div>
             </main>
-            <!-- Bottom Navigation for Mobile -->
             <nav class="md:hidden sticky bottom-0 w-full bg-white dark:bg-slate-900 border-t border-slate-200
                 dark:border-slate-800 flex justify-around py-4">
                 <button onclick="location.href='dashboard.html' " class="flex flex-col items-center gap-1
                     text-slate-400">
                     <span class="material-symbols-outlined">home</span>
-                    <span class="text-[10px]">Home</span>
+                    <span class="text-[10px] uppercase font-bold">Home</span>
+                </button>
+                <button onclick="location.href='medications.html' " class="flex flex-col items-center gap-1
+                    text-slate-400">
+                    <span class="material-symbols-outlined">pill</span>
+                    <span class="text-[10px] uppercase font-bold">Meds</span>
+                </button>
+                <button onclick="location.href='appointments.html' " class="flex flex-col items-center gap-1
+                    text-slate-400">
+                    <span class="material-symbols-outlined">calendar_month</span>
+                    <span class="text-[10px] uppercase font-bold">Calendar</span>
                 </button>
                 <button onclick="location.href='healthlogs.html' " class="flex flex-col items-center gap-1
                     text-primary">
                     <span class="material-symbols-outlined">monitoring</span>
-                    <span class="text-[10px]">Logs</span>
-                </button>
-                <button class="flex flex-col items-center gap-1 text-slate-400">
-                    <span class="material-symbols-outlined">person</span>
-                    <span class="text-[10px]">Profile</span>
+                    <span class="text-[10px] uppercase font-bold">Health</span>
                 </button>
             </nav>
         </div>

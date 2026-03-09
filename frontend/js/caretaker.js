@@ -7,10 +7,16 @@ async function fetchCaretakerData() {
         const medData = await medRes.json();
         const meds = medData.medications || [];
 
-        let takenCount = 0;
-        meds.forEach(m => { if (m.taken) takenCount++; });
+        const todayStr = new Date().toISOString().split('T')[0];
+        // Only count medications meant for today (Daily or specific date)
+        const activeMedsToday = meds.filter(m => !m.date || m.date === todayStr);
 
-        const adherencePercent = meds.length > 0 ? Math.round((takenCount / meds.length) * 100) : 100;
+        let takenCount = 0;
+        activeMedsToday.forEach(m => {
+            if (m.last_taken_date === todayStr) takenCount++;
+        });
+
+        const adherencePercent = activeMedsToday.length > 0 ? Math.round((takenCount / activeMedsToday.length) * 100) : 100;
 
         // Update Circular Meter
         document.getElementById('med-circle').setAttribute('stroke-dasharray', `${adherencePercent}, 100`);

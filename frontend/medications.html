@@ -14,17 +14,18 @@
         tailwind.config = {
             darkMode: "class",
             theme: {
-            extend: {
-                colors: {
-                    "primary": "#21c45d",
-                    "background-light": "#f6f8f7",
-                    "background-dark": "#122017",
-                },
-                fontFamily: {
-                    "display": ["Lexend", "sans-serif"]
-                },
-                borderRadius: {
-                "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                extend: {
+                    colors: {
+                        "primary": "#21c45d",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#122017",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"
+                    },
                 },
             },
         }
@@ -57,7 +58,6 @@
             <!-- Header Section -->
             <div class="mb-8">
                 <h1 class="text-4xl font-black tracking-tight mb-2">My Medications</h1>
-                <p class="text-slate-600 dark:text-slate-400 text-lg">Today</p>
             </div>
             <!-- Medication List -->
             <div id="medication-list" class="flex flex-col gap-6">
@@ -82,17 +82,16 @@
                 <span class="text-xs font-bold uppercase">Home</span>
             </a>
             <a class="flex flex-col items-center gap-1 text-primary" href="medications.html">
-                <span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL'
-                    1">pill</span>
+                <span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1">pill</span>
                 <span class="text-xs font-bold uppercase tracking-widest">Meds</span>
+            </a>
+            <a class="flex flex-col items-center gap-1 text-slate-400" href="appointments.html">
+                <span class="material-symbols-outlined text-3xl">calendar_month</span>
+                <span class="text-xs font-bold uppercase">Calendar</span>
             </a>
             <a class="flex flex-col items-center gap-1 text-slate-400" href="healthlogs.html">
                 <span class="material-symbols-outlined text-3xl">favorite</span>
                 <span class="text-xs font-bold uppercase">Health</span>
-            </a>
-            <a class="flex flex-col items-center gap-1 text-slate-400" href="#">
-                <span class="material-symbols-outlined text-3xl">person</span>
-                <span class="text-xs font-bold uppercase">Me</span>
             </a>
         </nav>
         <!-- Padding for bottom nav -->

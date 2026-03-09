@@ -1,20 +1,34 @@
 def analyze_health(systolic, diastolic, sugar):
-    if systolic > 180 or diastolic > 120:
-        return "Hypertensive crisis detected"
+    # Blood Pressure Logic based on provided ranges
+    if systolic >= 160 or diastolic >= 100:
+        bp_status = "High: Stage 2 Hypertension"
+    elif systolic >= 140 or diastolic >= 90:
+        bp_status = "High: Stage 1 Hypertension"
+    elif systolic >= 120 or diastolic >= 80:
+        bp_status = "Pre Hypertension detected"
+    elif systolic < 90 or diastolic < 60:
+        bp_status = "Low blood pressure detected"
+    else:
+        bp_status = "Normal"
 
-    if systolic > 150 or diastolic > 90:
-        return "High blood pressure detected"
-
-    if systolic < 90 or diastolic < 60:
-        return "Low blood pressure detected"
-
+    # Sugar Logic (Kept existing as no specific range was provided for sugar)
     if sugar > 200:
-        return "Very high blood sugar detected"
+        sugar_status = "Very high sugar"
+    elif sugar > 140:
+        sugar_status = "Elevated sugar"
+    elif sugar < 70:
+        sugar_status = "Low sugar"
+    else:
+        sugar_status = "Normal"
 
-    if sugar > 140:
-        return "Elevated blood sugar"
-
-    if sugar < 70:
-        return "Low blood sugar detected"
-
-    return "Health normal"
+    # Combine results
+    if bp_status == "Normal" and sugar_status == "Normal":
+        return "Health normal"
+    
+    status_parts = []
+    if bp_status != "Normal":
+        status_parts.append(bp_status)
+    if sugar_status != "Normal":
+        status_parts.append(sugar_status)
+        
+    return " & ".join(status_parts)

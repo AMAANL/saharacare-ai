@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#21c45d",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#122017",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend", "sans-serif"]
+                    },
+                },
+            },
+        }
+    </script>
+    <title>SaharaCare AI - My Appointments</title>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
+    <div class="layout-container flex h-full grow flex-col">
+        <header
+            class="flex items-center justify-between border-b border-blue-500/10 bg-white dark:bg-slate-900 px-6 py-4 sticky top-0 z-50">
+            <div class="flex items-center gap-4">
+                <a class="flex items-center gap-2 hover:opacity-80 transition-opacity" href="dashboard.html">
+                    <span class="material-symbols-outlined text-blue-500 text-3xl">arrow_back</span>
+                    <span class="text-lg font-bold tracking-tight">Dashboard</span>
+                </a>
+            </div>
+            <div class="flex items-center gap-4 text-blue-500">
+                <span class="material-symbols-outlined text-3xl">calendar_month</span>
+                <h2 class="text-xl font-black">Appointments</h2>
+            </div>
+            <div class="flex items-center">
+                <button class="p-2 rounded-full bg-blue-500/10 text-blue-500">
+                    <span class="material-symbols-outlined text-2xl">event</span>
+                </button>
+            </div>
+        </header>
+
+        <main class="max-w-2xl mx-auto w-full px-4 py-8">
+            <div class="mb-8">
+                <h1 class="text-4xl font-black tracking-tight mb-2 text-blue-600">Upcoming Visits</h1>
+                <p class="text-slate-600 dark:text-slate-400 text-lg">Your scheduled medical events</p>
+            </div>
+
+            <div id="appointment-list" class="flex flex-col gap-6">
+                <!-- Populated via appointments.js -->
+                <div class="p-6 bg-white dark:bg-slate-800 rounded-2xl shadow-lg animate-pulse">
+                    <div class="h-6 bg-slate-200 dark:bg-slate-700 rounded w-1/2 mb-4"></div>
+                    <div class="h-4 bg-slate-100 dark:bg-slate-600 rounded w-3/4"></div>
+                </div>
+            </div>
+
+            <div
+                class="mt-12 p-6 bg-blue-500/5 rounded-xl border-2 border-dashed border-blue-500/20 flex items-center gap-4">
+                <div class="bg-blue-500 text-white p-3 rounded-full">
+                    <span class="material-symbols-outlined text-3xl">medical_information</span>
+                </div>
+                <div>
+                    <p class="font-bold text-lg">Don't miss your check-up!</p>
+                    <p class="text-slate-600 dark:text-slate-400">Please prepare your reports before the visit.</p>
+                </div>
+            </div>
+        </main>
+
+        <nav
+            class="fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900 border-t border-primary/10 px-6 py-4 flex justify-around items-center z-50">
+            <a class="flex flex-col items-center gap-1 text-slate-400" href="dashboard.html">
+                <span class="material-symbols-outlined text-3xl">home</span>
+                <span class="text-xs font-bold uppercase">Home</span>
+            </a>
+            <a class="flex flex-col items-center gap-1 text-slate-400" href="medications.html">
+                <span class="material-symbols-outlined text-3xl">pill</span>
+                <span class="text-xs font-bold uppercase">Meds</span>
+            </a>
+            <a class="flex flex-col items-center gap-1 text-blue-500" href="appointments.html">
+                <span class="material-symbols-outlined text-4xl"
+                    style="font-variation-settings: 'FILL' 1">calendar_month</span>
+                <span class="text-xs font-bold uppercase tracking-widest">Calendar</span>
+            </a>
+            <a class="flex flex-col items-center gap-1 text-slate-400" href="healthlogs.html">
+                <span class="material-symbols-outlined text-3xl">favorite</span>
+                <span class="text-xs font-bold uppercase">Health</span>
+            </a>
+        </nav>
+
+        <div class="h-24"></div>
+    </div>
+
+    <script src="js/appointments.js"></script>
+</body>
+
+</html>

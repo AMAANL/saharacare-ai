@@ -44,6 +44,12 @@ if (playVoiceBtn) {
                     audioPlayer.src = `data:audio/wav;base64,${data.audio.data}`;
                     audioPlayer.play().catch(e => console.error("Play error:", e));
                 }
+
+                if (data.redirect) {
+                    setTimeout(() => {
+                        window.location.href = data.redirect;
+                    }, 2500); // Wait for speech to start/finish
+                }
                 playVoiceBtn.innerText = 'Speak Command';
             } catch (error) {
                 console.error('Voice reminder error:', error);

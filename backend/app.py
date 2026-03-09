@@ -41,8 +41,8 @@ def serve_html(path):
 db = {
     "users": {},
     "medications": [
-        {"id": 1, "name": "Vitamin D", "time": "10:00 AM", "date": "", "taken": False},
-        {"id": 2, "name": "Metformin", "time": "08:00 AM", "date": "", "taken": False}
+        {"id": 1, "name": "Vitamin D", "time": "10:00 AM", "date": "", "last_taken_date": None},
+        {"id": 2, "name": "Metformin", "time": "08:00 AM", "date": "", "last_taken_date": None}
     ],
     "appointments": [
         {"id": 1, "title": "Dr. Smith", "date": "Tomorrow", "time": "2 PM"}
@@ -66,13 +66,16 @@ def register():
 @app.route('/add_medication', methods=['POST'])
 def add_medication():
     data = request.json
-    med_id = len(db['medications']) + 1
+    # Better ID generation to avoid duplicates after deletions
+    existing_ids = [m['id'] for m in db['medications']]
+    med_id = (max(existing_ids) + 1) if existing_ids else 1
+    
     new_med = {
         "id": med_id,
         "name": data.get('name'),
         "time": data.get('time'),
-        "date": data.get('date', ''),
-        "taken": False
+        "date": data.get('date', ''), # Empty means daily
+        "last_taken_date": None # Store the YYYY-MM-DD when it was last taken
     }
     db['medications'].append(new_med)
     return jsonify({"message": "Medication added successfully", "medication": new_med}), 201
@@ -112,10 +115,14 @@ def delete_appointment(appt_id):
 def take_medication():
     data = request.json
     med_id = data.get('id')
+    print(f"DEBUG: Processing mark as taken for ID: {med_id}")
+
     for m in db['medications']:
-        if m['id'] == int(med_id):
-            m['taken'] = True
-            return jsonify({"message": "Medication marked as taken"}), 200
+        if int(m['id']) == int(med_id):
+            # Set date it was taken (reset daily)
+            m['last_taken_date'] = datetime.datetime.now().strftime('%Y-%m-%d')
+            return jsonify({"message": "Medication marked as taken", "status": "taken"}), 200
+            
     return jsonify({"message": "Medication not found"}), 404
 
 @app.route('/health_log', methods=['POST'])
@@ -161,60 +168,80 @@ def sos_alert():
     db['sos_logs'].append(sos_entry)
     return jsonify({"message": "Emergency SOS triggered and logged"}), 200
 
+def safe_str(text):
+    """Sanitize strings for PDF (removes non-Latin-1 characters like Hindi to prevent crashes)"""
+    if not text:
+        return ""
+    # Convert to string and encode/decode to strip unsupported characters
+    return str(text).encode('latin-1', 'replace').decode('latin-1')
+
 @app.route('/generate_report', methods=['GET'])
 def generate_report():
     pdf = FPDF()
     pdf.add_page()
+    
+    # Title
     pdf.set_font("helvetica", 'B', 16)
-    pdf.cell(190, 10, txt="SaharaCare AI - Patient Health Report", ln=True, align='C')
+    pdf.cell(190, 10, text="SaharaCare - Monthly Health Report", new_x="LMARGIN", new_y="NEXT", align='C')
     pdf.set_font("helvetica", '', 12)
-    pdf.cell(190, 10, txt=f"Report Generated: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", ln=True, align='C')
+    pdf.cell(190, 10, text=f"Report Generated: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", new_x="LMARGIN", new_y="NEXT", align='C')
     pdf.ln(10)
 
     # 1. Meds Section
     pdf.set_font("helvetica", 'B', 14)
-    pdf.cell(0, 10, txt="1. Medication Overview", ln=True)
+    pdf.cell(0, 10, text="1. Medication Overview", new_x="LMARGIN", new_y="NEXT")
     pdf.set_font("helvetica", 'B', 10)
-    pdf.cell(60, 10, border=1, txt="Medicine Name")
-    pdf.cell(40, 10, border=1, txt="Schedule Time")
-    pdf.cell(40, 10, border=1, txt="Date (if any)")
-    pdf.cell(30, 10, border=1, txt="Status", ln=True)
+    pdf.cell(60, 10, border=1, text="Medicine Name")
+    pdf.cell(40, 10, border=1, text="Schedule Time")
+    pdf.cell(40, 10, border=1, text="Date (if any)")
+    pdf.cell(30, 10, border=1, text="Status", new_x="LMARGIN", new_y="NEXT")
 
     pdf.set_font("helvetica", '', 10)
     for m in db['medications']:
-        pdf.cell(60, 10, border=1, txt=str(m['name']))
-        pdf.cell(40, 10, border=1, txt=str(m['time']))
-        pdf.cell(40, 10, border=1, txt=str(m.get('date','Daily')))
-        pdf.cell(30, 10, border=1, txt="Taken" if m['taken'] else "Pending", ln=True)
+        # Sanitize all dynamic inputs
+        name = safe_str(m['name'])
+        time = safe_str(m['time'])
+        date = safe_str(m.get('date','Daily'))
+        today_str = datetime.datetime.now().strftime('%Y-%m-%d')
+        status = "Taken" if m.get('last_taken_date') == today_str else "Pending"
+        
+        pdf.cell(60, 10, border=1, text=name)
+        pdf.cell(40, 10, border=1, text=time)
+        pdf.cell(40, 10, border=1, text=date)
+        pdf.cell(30, 10, border=1, text=status, new_x="LMARGIN", new_y="NEXT")
     pdf.ln(10)
 
     # 2. Health Logs Section
     pdf.set_font("helvetica", 'B', 14)
-    pdf.cell(0, 10, txt="2. Detailed Health Logs (BP & Glucose)", ln=True)
+    pdf.cell(0, 10, text="2. Detailed Health Logs (BP & Glucose)", new_x="LMARGIN", new_y="NEXT")
     pdf.set_font("helvetica", 'B', 10)
-    pdf.cell(50, 10, border=1, txt="Date/Time")
-    pdf.cell(40, 10, border=1, txt="BP (sys/dia)")
-    pdf.cell(30, 10, border=1, txt="Glucose")
-    pdf.cell(60, 10, border=1, txt="AI Analysis", ln=True)
+    pdf.cell(50, 10, border=1, text="Date/Time")
+    pdf.cell(40, 10, border=1, text="BP (sys/dia)")
+    pdf.cell(30, 10, border=1, text="Glucose")
+    pdf.cell(60, 10, border=1, text="AI Analysis", new_x="LMARGIN", new_y="NEXT")
 
     pdf.set_font("helvetica", '', 10)
     for log in db.get('health_logs', []):
-        dt_str = log['date'][:16].replace('T', ' ')
-        bp_str = f"{log['systolic']}/{log['diastolic']}"
-        glu_str = str(log.get('glucose', '-')) + " mg/dL"
-        analysis = analyze_health(log['systolic'], log['diastolic'], log.get('glucose', 0))
+        # Sanitize all dynamic inputs
+        dt_str = safe_str(log['date'][:16].replace('T', ' '))
+        bp_str = safe_str(f"{log['systolic']}/{log['diastolic']}")
+        glu_str = safe_str(str(log.get('glucose', '-')) + " mg/dL")
+        analysis_raw = analyze_health(log['systolic'], log['diastolic'], log.get('glucose', 0))
+        analysis = safe_str(analysis_raw)
 
-        pdf.cell(50, 10, border=1, txt=dt_str)
-        pdf.cell(40, 10, border=1, txt=bp_str)
-        pdf.cell(30, 10, border=1, txt=glu_str)
-        pdf.cell(60, 10, border=1, txt=analysis, ln=True)
+        pdf.cell(50, 10, border=1, text=dt_str)
+        pdf.cell(40, 10, border=1, text=bp_str)
+        pdf.cell(30, 10, border=1, text=glu_str)
+        pdf.cell(60, 10, border=1, text=analysis, new_x="LMARGIN", new_y="NEXT")
 
     # Return as response with correct headers using BytesIO
     from io import BytesIO
-    pdf_bytes = pdf.output()
-    # If the output is a string (rare for fpdf2 but possible in some config), encode it
-    if isinstance(pdf_bytes, str):
-        pdf_bytes = pdf_bytes.encode('latin1')
+    try:
+        # Ensure output is converted to bytes (fpdf2 returns bytearray)
+        pdf_bytes = bytes(pdf.output())
+    except Exception as e:
+        print(f"PDF Generation Error: {e}")
+        return jsonify({"message": "Error generating PDF. Please ensure data doesn't contain unsupported characters."}), 500
     
     response = make_response(pdf_bytes)
     response.headers['Content-Type'] = 'application/pdf'
@@ -227,13 +254,14 @@ def handle_voice_command():
     text = data.get('text', '').lower()
     print(f"DEBUG: Received Voice Command: '{text}'")
     
-    # Language forced to Hindi as per user request
     lang_code = 'hi-IN'
     is_hindi = True
 
-    # Healthcare terms mapping (Keywords in both scripts for reliability)
     health_keywords = ['sehat', 'health', 'bp', 'sugar', 'सेहत', 'तबीयत', 'कैसी', 'report', 'condition']
     med_keywords = ['goli', 'dawai', 'दवा', 'गोली', 'medicine', 'tablet', 'pill', 'khani', 'khana', 'take', 'schedule', 'meds', 'which']
+    appt_keywords = ['doctor', 'appointment', 'visit', 'checkup', 'मिलना', 'अपॉइंटमेंट', 'डॉक्टर', 'dikha', 'milna']
+
+    redirect_url = None
 
     # 1. Health Logic
     if any(k in text for k in health_keywords):
@@ -243,32 +271,53 @@ def handle_voice_command():
             recent_log = db['health_logs'][-1]
             sys = recent_log['systolic']
             dia = recent_log['diastolic']
-            analysis = analyze_health(sys, dia, recent_log.get('glucose', 0))
+            glu = recent_log.get('glucose', 0)
+            analysis = analyze_health(sys, dia, glu)
             
-            if analysis == "High blood pressure detected":
-                reply = f"आपका ब्लड प्रेशर अधिक है। यह {sys} बटा {dia} है। कृपया आराम करें।"
+            # Map analysis to Hindi and handle all cases
+            bp_mention = f"आपका ब्लड प्रेशर {sys} बटा {dia} है।"
+            glu_mention = f" और शुगर लेवल {glu} है।" if glu > 0 else ""
+            
+            if "Stage 2" in analysis:
+                reply = f"सावधान! {bp_mention} यह काफी ज्यादा है (स्टेज 2)। तुरंत डॉक्टर से संपर्क करें।"
+            elif "Stage 1" in analysis:
+                reply = f"{bp_mention} यह बढ़ा हुआ है (स्टेज 1)। कृपया अपना ख्याल रखें।"
+            elif "Pre Hypertension" in analysis:
+                reply = f"{bp_mention} यह सामान्य से थोड़ा ज्यादा है। सावधान रहें।"
+            elif "Low blood pressure" in analysis:
+                reply = f"{bp_mention} यह सामान्य से कम है। कृपया आराम करें।"
+            elif "Very high" in analysis:
+                 reply = f"सावधान! आपका शुगर लेवल काफी बढ़ा हुआ है ({glu})।"
+            elif "Elevated" in analysis:
+                 reply = f"आपका शुगर लेवल थोड़ा बढ़ा हुआ है ({glu})।"
+            elif "Low sugar" in analysis:
+                 reply = f"आपका शुगर लेवल कम है ({glu})। कुछ मीठा लें।"
             else:
-                reply = f"आपकी सेहत बिल्कुल ठीक है। आपका ब्लड प्रेशर {sys} बटा {dia} नॉर्मल है।"
+                reply = f"आपकी सेहत बिल्कुल ठीक है। {bp_mention}{glu_mention} यह नॉर्मल है।"
     
     # 2. Medicine Logic
     elif any(k in text for k in med_keywords):
         today_str = datetime.datetime.now().strftime('%Y-%m-%d')
-        un_taken = [m for m in db['medications'] if not m['taken'] and (m.get('date', '') == '' or m.get('date') == today_str)]
+        un_taken = [m for m in db['medications'] if m.get('last_taken_date') != today_str and (m.get('date', '') == '' or m.get('date') == today_str)]
         
         if not un_taken:
             reply = "आज के लिए आपकी कोई दवाई बाकी नहीं है।"
         else:
             meds_str_hi = " और ".join([f"{m['name']} {m['time']}" for m in un_taken])
             reply = f"आपको ये दवाइयां खानी हैं: {meds_str_hi}।"
+
+    # 3. Appointment Logic
+    elif any(k in text for k in appt_keywords):
+        reply = "यहाँ आपके अपॉइंटमेंट्स हैं।"
+        redirect_url = "appointments.html"
             
-    # 3. Fallback
+    # 4. Fallback
     else:
-        reply = "मुझे आपका सवाल समझ नहीं आया। क्या आप दवाई या सेहत के बारे में पूछना चाहते हैं?"
+        reply = "मुझे आपका सवाल समझ नहीं आया। क्या आप दवाई, सेहत या अपॉइंटमेंट्स के बारे में पूछना चाहते हैं?"
         
     audio_data = generate_hindi_audio(reply, target_language=lang_code)
-    return jsonify({"audio": audio_data, "text": reply}), 200
+    return jsonify({"audio": audio_data, "text": reply, "redirect": redirect_url}), 200
 
 if __name__ == '__main__':
-    # Use PORT from environment variable (default to 7860 for Hugging Face)
     port = int(os.environ.get("PORT", 7860))
     app.run(host='0.0.0.0', port=port, debug=True)
