@@ -45,7 +45,7 @@ Working link: https://huggingface.co/spaces/Amaanlakdawala/saharacareai
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### 1. Installation
 Clone the repository and install dependencies:
